@@ -16,6 +16,10 @@ int main()
     int posY{windowHeight - height};
     int velocity{0};
     int gravity{1}; // (pixels/frame)/frame
+    //Is rentangle in the air?
+    bool isInAir{false};
+    // jump velocity
+    const int jumpVel{-22};
 
     //Set 60 FPS
     SetTargetFPS(60);
@@ -39,18 +43,20 @@ int main()
         if(posY >= windowHeight - height)
         {
             //rentangle is on the ground
+            isInAir = false;
             velocity = 0;
         }
         else
         {
             // rentangle is in the air
+            isInAir = true;
             velocity += gravity;
         }
 
         //Moving codes
-        if(IsKeyPressed(KEY_SPACE))
+        if(IsKeyPressed(KEY_SPACE) && !isInAir)
         {
-            velocity-=10;
+            velocity+=jumpVel;
         }
 
         //End drawing
