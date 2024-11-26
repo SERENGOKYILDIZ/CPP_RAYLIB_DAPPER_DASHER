@@ -15,7 +15,7 @@ int main()
 
     int posY{windowHeight - height};
     int velocity{0};
-
+    int gravity{1}; // (pixels/frame)/frame
 
     //Set 60 FPS
     SetTargetFPS(60);
@@ -30,8 +30,22 @@ int main()
         ClearBackground(WHITE);
 
         //Draw rentangle
-        posY += velocity;
         DrawRectangle(windowWidht/2, posY, widht, height, BLUE);
+
+        //Update Y position
+        posY += velocity;
+
+        // apply gravity
+        if(posY >= windowHeight - height)
+        {
+            //rentangle is on the ground
+            velocity = 0;
+        }
+        else
+        {
+            // rentangle is in the air
+            velocity += gravity;
+        }
 
         //Moving codes
         if(IsKeyPressed(KEY_SPACE))
