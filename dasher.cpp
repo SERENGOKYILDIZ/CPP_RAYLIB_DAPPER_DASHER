@@ -3,23 +3,40 @@
 int main()
 {
     //Window dimensions
-    const int windowWidht{512};
+    const int windowWidth{512};
     const int windowHeight{380};
 
     //Init window
-    InitWindow(windowWidht, windowHeight, "DAPPER DASHER GAME");
+    InitWindow(windowWidth, windowHeight, "DAPPER DASHER GAME");
 
-    // rentangle dimensions
-    const int widht{50};
-    const int height{80};
+    //For sprite sheet to texture file
+    Texture2D scarfy = LoadTexture("textures/scarfy.png");
+    //For sprite sheet to rectangle
+    Rectangle scarfyRec;
+    scarfyRec.width = scarfy.width/6; //Because there are 6 images.
+    scarfyRec.height = scarfy.height;
+    scarfyRec.x = 0;
+    scarfyRec.y = 0;
+    //For sprite sheet to position
+    Vector2 scarfyPos;
+    scarfyPos.x = windowWidth/2 - scarfyRec.width/2;
+    scarfyPos.y = windowHeight - scarfyRec.height;
+    
+    //Speed and gravity
+    int velocity{0};            // (pixels/second)
+    int gravity{1'000};         // (pixels/second)/second
 
-    int posY{windowHeight - height};
-    int velocity{0};
-    int gravity{1}; // (pixels/frame)/frame
     //Is rentangle in the air?
     bool isInAir{false};
     // jump velocity
-    const int jumpVel{-22};
+    const int jumpVel{-600};    // (pixels/second)
+
+    //animation frame
+    int frame{0};
+
+    //Animation times
+    const float updateTime{1.0/12.0};
+    float runningTime{0.0};
 
     //Set 60 FPS
     SetTargetFPS(60);
@@ -30,17 +47,11 @@ int main()
         //Start drawing
         BeginDrawing();
 
-        //Background color
-        ClearBackground(WHITE);
-
-        //Draw rentangle
-        DrawRectangle(windowWidht/2, posY, widht, height, BLUE);
-
-        //Update Y position
-        posY += velocity;
+        //Get the Delta Time (time since last frame)
+        const float dT{GetFrameTime()};
 
         // apply gravity
-        if(posY >= windowHeight - height)
+        if(scarfyPos.y >= windowHeight - scarfyRec.height)
         {
             //rentangle is on the ground
             isInAir = false;
@@ -50,7 +61,7 @@ int main()
         {
             // rentangle is in the air
             isInAir = true;
-            velocity += gravity;
+            velocity += gravity * dT;
         }
 
         //Moving codes
@@ -58,9 +69,35 @@ int main()
         {
             velocity+=jumpVel;
         }
+        
+        //Update Y position
+        scarfyPos.y += velocity * dT;
+        
+        //Background color
+        ClearBackground(WHITE);
+
+        //Draw rentangle
+        //DrawRectangle(windowWidth/2, posY, widht, height, BLUE);
+
+        // update running time
+        runningTime += dT;
+        if(runningTime >= updateTime)
+        {
+            // update animation frame
+            runningTime=0.0;
+            scarfyRec.x = frame * scarfyRec.width;
+            frame++; 
+            if(frame > 5){frame=0;}
+        }
+
+        //Draw a texture rectangle
+        DrawTextureRec(scarfy, scarfyRec, scarfyPos, WHITE);
 
         //End drawing
         EndDrawing();
-
     }
+    //For save the our GPU powerdawd
+    UnloadTexture(scarfy);
+    //Close the window
+    CloseWindow();
 }
